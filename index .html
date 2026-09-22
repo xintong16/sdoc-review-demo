@@ -1,0 +1,637 @@
+<title>SDOC Review Desk</title>
+<style>
+:root{
+  --bg:#F7F3E3;
+  --panel:#FFFDF5;
+  --panel-2:#F0E9D4;
+  --border:#DDD0AE;
+  --ink:#2B2118;
+  --ink-dim:#6B5A45;
+  --ink-faint:#9C8B70;
+  --navy:#AF9164;
+  --navy-ink:#EFE6CE;
+  --teal:#8A6D3F;
+  --teal-ink:#EFE6CE;
+  --amber:#9C6B12;
+  --amber-bg:#F3E1B8;
+  --red:#6F1A07;
+  --red-bg:#F3DCD3;
+  --green:#3D6B3A;
+  --green-bg:#DEEBD9;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+  --sans: "IBM Plex Sans", -apple-system, sans-serif;
+  --shadow: 0 1px 2px rgba(43,33,24,.08), 0 10px 28px -14px rgba(43,33,24,.28);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#2B2118;
+    --panel:#382C20;
+    --panel-2:#453626;
+    --border:#5A4832;
+    --ink:#F7F3E3;
+    --ink-dim:#D8C9AC;
+    --ink-faint:#AF9164;
+    --navy:#D6B77E;
+    --navy-ink:#4A3A26;
+    --teal:#E0C48C;
+    --teal-ink:#4A3A26;
+    --amber:#E8B25A;
+    --amber-bg:#4E3B1C;
+    --red:#E8A48F;
+    --red-bg:#4E2A20;
+    --green:#A9CDA0;
+    --green-bg:#2E3F27;
+    --shadow: 0 1px 2px rgba(0,0,0,.35), 0 10px 28px -14px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#2B2118;
+  --panel:#382C20;
+  --panel-2:#453626;
+  --border:#5A4832;
+  --ink:#F7F3E3;
+  --ink-dim:#D8C9AC;
+  --ink-faint:#AF9164;
+  --navy:#D6B77E;
+  --navy-ink:#4A3A26;
+  --teal:#E0C48C;
+  --teal-ink:#4A3A26;
+  --amber:#E8B25A;
+  --amber-bg:#4E3B1C;
+  --red:#E8A48F;
+  --red-bg:#4E2A20;
+  --green:#A9CDA0;
+  --green-bg:#2E3F27;
+  --shadow: 0 1px 2px rgba(0,0,0,.35), 0 10px 28px -14px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box;}
+html,body{font-size:17px;}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--sans);
+  padding-inline:18px;
+}
+.wrap{max-width:1240px;margin:0 auto;padding-block:28px 56px;}
+header.top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px;}
+.brand-eyebrow{font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin:0 0 6px;font-weight:600;}
+h1{font-size:34px;margin:0;letter-spacing:-.01em;text-wrap:balance;}
+.top-meta{font-family:var(--mono);font-size:14px;color:var(--ink-faint);text-align:right;}
+.stats{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:22px;}
+.stat{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px 18px;min-width:120px;box-shadow:var(--shadow);}
+.stat b{display:block;font-family:var(--mono);font-size:26px;line-height:1.1;}
+.stat span{font-size:13px;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.04em;}
+.layout{display:grid;grid-template-columns:320px 1fr;gap:18px;align-items:start;}
+@media (max-width:860px){.layout{grid-template-columns:1fr;}}
+
+.list{background:var(--panel);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);}
+.list-head{padding:14px 16px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-dim);}
+.item{width:100%;text-align:left;border:0;background:transparent;padding:16px;display:flex;flex-direction:column;gap:8px;cursor:pointer;border-bottom:1px solid var(--border);color:var(--ink);font-family:var(--sans);}
+.item:last-child{border-bottom:0;}
+.item:hover{background:var(--panel-2);}
+.item.active{background:var(--navy-ink);}
+.item-top{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.item-id{font-family:var(--mono);font-size:14px;color:var(--ink-dim);}
+.item-subj{font-size:16px;font-weight:600;line-height:1.35;}
+.item-cat{font-size:13px;color:var(--ink-faint);}
+.decision-mark{font-size:13px;font-family:var(--mono);}
+.decision-mark.approved{color:var(--green);}
+.decision-mark.flagged{color:var(--red);}
+
+.pill{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:12.5px;text-transform:uppercase;letter-spacing:.05em;padding:4px 10px;border-radius:100px;white-space:nowrap;}
+.pill.ok{background:var(--green-bg);color:var(--green);}
+.pill.mismatch{background:var(--red-bg);color:var(--red);}
+.pill.review{background:var(--amber-bg);color:var(--amber);}
+.pill.spam{background:var(--panel-2);color:var(--ink-faint);border:1px solid var(--border);}
+
+.detail{background:var(--panel);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:26px;min-height:520px;display:flex;flex-direction:column;gap:22px;}
+@media (max-width:600px){.detail{padding:18px;}}
+.detail-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:18px;}
+.detail-id{font-family:var(--mono);font-size:14px;color:var(--ink-faint);margin-bottom:6px;}
+.detail-subj{font-size:23px;font-weight:700;letter-spacing:-.005em;text-wrap:balance;}
+.detail-from{font-size:15px;color:var(--ink-dim);margin-top:6px;}
+.badges{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+
+.email-body{background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:18px;font-size:16px;line-height:1.65;color:var(--ink);white-space:pre-wrap;}
+.section-label{font-family:var(--mono);font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-dim);margin-bottom:10px;font-weight:600;}
+
+.compare-table{width:100%;border-collapse:collapse;font-size:15px;}
+.compare-table th{text-align:left;font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);padding:8px 12px;border-bottom:1px solid var(--border);}
+.compare-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top;}
+.compare-table tr:last-child td{border-bottom:0;}
+.field-name{font-family:var(--mono);font-size:13.5px;color:var(--ink-dim);white-space:nowrap;}
+.compare-table tr.diff td{background:var(--red-bg);}
+.compare-table tr.diff .field-name{color:var(--red);}
+.compare-table .diff-val{color:var(--red);font-weight:600;}
+.table-scroll{overflow-x:auto;border:1px solid var(--border);border-radius:12px;}
+.table-scroll .compare-table{border:0;border-radius:0;}
+.table-scroll .compare-table th, .table-scroll .compare-table td{border-bottom:1px solid var(--border);}
+
+.reason-box{border-radius:12px;padding:16px 18px;display:flex;gap:14px;align-items:flex-start;}
+.reason-box.review{background:var(--amber-bg);}
+.reason-box.spam{background:var(--panel-2);border:1px solid var(--border);}
+.reason-box.ok{background:var(--green-bg);}
+.reason-icon{font-family:var(--mono);font-size:20px;line-height:1;}
+.reason-box.review .reason-icon,.reason-box.review .reason-title{color:var(--amber);}
+.reason-box.spam .reason-icon,.reason-box.spam .reason-title{color:var(--ink-dim);}
+.reason-box.ok .reason-icon,.reason-box.ok .reason-title{color:var(--green);}
+.reason-title{font-weight:700;font-size:16px;margin-bottom:4px;}
+.reason-text{font-size:15px;color:var(--ink-dim);line-height:1.55;}
+.reason-text code{font-family:var(--mono);background:rgba(43,33,24,.08);padding:2px 6px;border-radius:5px;}
+
+.attach-row{display:flex;gap:8px;flex-wrap:wrap;}
+.attach-chip{font-family:var(--mono);font-size:13.5px;border:1px solid var(--border);background:var(--panel-2);padding:6px 12px;border-radius:8px;color:var(--ink-dim);}
+.attach-chip.bad{border-color:var(--red);color:var(--red);background:var(--red-bg);}
+
+.actions{margin-top:auto;padding-top:18px;border-top:1px solid var(--border);display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.btn{font-family:var(--sans);font-weight:600;font-size:15px;border-radius:9px;padding:11px 18px;border:1px solid transparent;cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
+.btn-approve{background:var(--green);color:#fff;}
+.btn-approve:hover{filter:brightness(1.06);}
+.btn-flag{background:transparent;border-color:var(--red);color:var(--red);}
+.btn-flag:hover{background:var(--red-bg);}
+.btn-reset{background:transparent;border-color:var(--border);color:var(--ink-dim);}
+.decision-status{font-family:var(--mono);font-size:14px;margin-left:auto;}
+.decision-status.approved{color:var(--green);}
+.decision-status.flagged{color:var(--red);}
+
+.draft-box{border:1px solid var(--border);border-radius:12px;background:var(--panel-2);padding:16px;display:flex;flex-direction:column;gap:10px;}
+.draft-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
+.draft-tag{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--teal);font-weight:600;}
+.draft-lang{font-family:var(--mono);font-size:12.5px;color:var(--ink-faint);}
+.draft-field{font-size:13px;font-family:var(--mono);color:var(--ink-faint);margin-bottom:4px;}
+.draft-subject{font-size:15.5px;font-weight:600;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:9px 12px;width:100%;color:var(--ink);font-family:var(--sans);}
+.draft-textarea{width:100%;min-height:180px;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:15px;line-height:1.6;color:var(--ink);font-family:var(--sans);resize:vertical;}
+.draft-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.draft-note{font-size:13px;color:var(--ink-faint);line-height:1.5;}
+
+footer{margin-top:26px;font-family:var(--mono);font-size:13px;color:var(--ink-faint);text-align:center;}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="brand-eyebrow">Averis SDOC · Human-in-the-Loop</p>
+      <h1>Review Desk</h1>
+    </div>
+    <div class="top-meta">Team Hybrid — demo batch · 8 of 520 emails</div>
+  </header>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="layout">
+    <nav class="list" id="list">
+      <div class="list-head">Queue</div>
+    </nav>
+    <section class="detail" id="detail"></section>
+  </div>
+
+  <footer>SDOC verification pipeline — n8n + Gemini · this queue shows one example per outcome the classifier produces</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  const EMAILS = [
+    {
+      id: "email_001",
+      subject: "SI vs BL — Paperone Copier Paper / Kuala Lumpur–Callao",
+      from: "ops@aprilfareast.com.my",
+      category: "BL_COMPARISON",
+      status: "OK",
+      body: "Hi team,\n\nPlease find attached the Shipping Instruction and draft Bill of Lading for the Paperone shipment to Callao. Kindly confirm the BL matches the SI before we release for signature.\n\nThanks,\nOperations, April Far East",
+      attachments: ["email_001_SI.xlsx", "email_001_BL.xlsx"],
+      si: {
+        "Shipper/Exporter": "APRIL FAR EAST (M) SDN BHD",
+        "Consignee": "MOORIM SP CO., LTD",
+        "Notify Party": "UAB NOVAKOPA",
+        "Port of Loading": "PORT KLANG (WESTPORT), MALAYSIA",
+        "Discharge Port": "CALLAO, PERU",
+        "Containers": "1 x 40'HC",
+        "Gross Weight": "21,577 KG",
+        "Vessel / Voyage": "MMSS 2507 V.257087E / 11S",
+        "Goods": "PAPERONE DIGITAL COPIER PAPER",
+        "HS Code": "48025600",
+        "Booking Ref": "MSDUL0942518196"
+      },
+      bl: {
+        "Shipper/Exporter": "APRIL FAR EAST (M) SDN BHD",
+        "Consignee": "MOORIM SP CO., LTD",
+        "Notify Party": "UAB NOVAKOPA",
+        "Port of Loading": "PORT KLANG (WESTPORT), MALAYSIA",
+        "Discharge Port": "CALLAO, PERU",
+        "Containers": "1 x 40'HC",
+        "Gross Weight": "21,577 KG",
+        "Vessel / Voyage": "MMSS 2507 V.257087E / 11S",
+        "Goods": "PAPERONE DIGITAL COPIER PAPER",
+        "HS Code": "48025600",
+        "Booking Ref": "MSDUL0942518196"
+      },
+      has_defect: false,
+      defect_fields: []
+    },
+    {
+      id: "email_004",
+      subject: "SI vs BL — Coated Ivory Board / Nantong–Karachi",
+      from: "ops@aprilfareast.com.my",
+      category: "BL_COMPARISON",
+      status: "MISMATCH",
+      body: "Hi team,\n\nAttached SI and draft BL for the Coated Ivory Board shipment ex Nantong to Karachi, 6x40'HC. Please verify against the SI and flag anything before we confirm with the carrier.\n\nRegards,\nOperations, April Far East",
+      attachments: ["email_004_SI.xlsx", "email_004_BL.xlsx"],
+      si: {
+        "Shipper/Exporter": "APRIL FAR EAST (M) SDN BHD",
+        "Consignee": "EAST BRIGHT FZ-LLC",
+        "Notify Party": "EAST BRIGHT FZ-LLC",
+        "Port of Loading": "NANTONG, CHINA",
+        "Discharge Port": "KARACHI, PAKISTAN",
+        "Containers": "6 x 40'HC",
+        "Gross Weight": "131,058 KG",
+        "Vessel / Voyage": "NAP 914 V.BS007 / BS012",
+        "Goods": "COATED IVORY BOARD",
+        "HS Code": "48105900",
+        "Booking Ref": "ONEYSINF32871"
+      },
+      bl: {
+        "Shipper/Exporter": "APRIL FAR EAST (M) SDN BHD",
+        "Consignee": "TO THE ORDER OF: UAB NOVAKOPA",
+        "Notify Party": "UAB NOVAKOPA",
+        "Port of Loading": "NANTONG, CHINA",
+        "Discharge Port": "KARACHI, PAKISTAN",
+        "Containers": "6 x 40'HC",
+        "Gross Weight": "131,058 KG",
+        "Vessel / Voyage": "NAP 914 V.BS007 / BS012",
+        "Goods": "COATED IVORY BOARD",
+        "HS Code": "48105900",
+        "Booking Ref": "ONEYSINF32871"
+      },
+      has_defect: true,
+      defect_fields: ["Consignee", "Notify Party"],
+      draftReply: {
+        language: "English",
+        subject: "Correction needed — BL draft vs SI, Booking ONEYSINF32871",
+        body: "Hi,\n\nWe compared the draft Bill of Lading against your Shipping Instruction for booking ONEYSINF32871 and found a mismatch that needs correcting before we can approve it:\n\n- Consignee — SI: \"EAST BRIGHT FZ-LLC\" / BL: \"TO THE ORDER OF: UAB NOVAKOPA\"\n- Notify Party — SI: \"EAST BRIGHT FZ-LLC\" / BL: \"UAB NOVAKOPA\"\n\nCould you confirm which party is correct and reissue the BL draft accordingly? All other fields (vessel, containers, weight, commodity) match.\n\nThanks,\nSDOC Verification Team"
+      }
+    },
+    {
+      id: "email_003",
+      subject: "Re: SI for review — container release",
+      from: "docs@eastbrightfz.ae",
+      category: "BL_COMPARISON",
+      status: "NEEDS_REVIEW",
+      review_reason: "missing_attachment",
+      body: "Hi,\n\nFollowing up on the SI we discussed on the call — can your team confirm receipt and let us know if the BL draft is ready to go? We'd like to close this out before the vessel cut-off.\n\nBest,\nDocumentation Team",
+      attachments: [],
+      claimsAttachment: true,
+      draftReply: {
+        language: "English",
+        subject: "Re: SI for review — attachment missing",
+        body: "Hi,\n\nThanks for the follow-up. We don't see an SI or BL attached to this thread on our end — could you resend the document so we can run the verification before the vessel cut-off?\n\nThanks,\nSDOC Verification Team"
+      }
+    },
+    {
+      id: "email_007",
+      subject: "Request: new Shipping Instruction — Penang to Rotterdam",
+      from: "logistics@pacificoffice.com.my",
+      category: "SI_REQUEST",
+      status: "NEEDS_REVIEW",
+      review_reason: null,
+      body: "Hi team,\n\nWe have a new booking ready — could you prepare the Shipping Instruction for the upcoming Penang to Rotterdam lane? Cargo is general trading goods, 2x20'GP, ready for shipper details as soon as the booking confirmation comes through.\n\nLet me know what details you still need from our side.\n\nThanks,\nLogistics, Pacific Office",
+      attachments: []
+    },
+    {
+      id: "email_002",
+      subject: "Invoice INV-33210 — discrepancy in freight charge",
+      from: "accounts@moorimsp.co.kr",
+      category: "INVOICE_QUERY",
+      status: "NEEDS_REVIEW",
+      review_reason: null,
+      body: "Hello,\n\nWe've received invoice INV-33210 for the Callao shipment, but the freight line doesn't match the rate agreed in our contract (PREPAID, USD 1,850/container). Could someone from billing confirm and reissue if needed?\n\nThanks,\nAccounts, Moorim SP Co., Ltd",
+      attachments: ["INV-33210.pdf"]
+    },
+    {
+      id: "email_464",
+      subject: "Office closed — public holiday notice",
+      from: "admin@aprilfareast.com.my",
+      category: "GENERAL",
+      status: "OK",
+      body: "Dear all,\n\nPlease note our office will be closed on Thursday for the public holiday. Normal operations resume Friday morning. For urgent shipment matters during the closure, please contact the duty line.\n\nRegards,\nAdmin",
+      attachments: []
+    },
+    {
+      id: "email_015",
+      subject: "You've been selected — claim your logistics rewards now!!!",
+      from: "rewards-noreply@promo-shiplogix.biz",
+      category: "SPAM",
+      status: "OK",
+      body: "CONGRATULATIONS! Your company has been selected for a FREE logistics rewards package worth $5,000. Click below within 24 hours to claim before this offer expires. No shipping account required!\n\n[CLAIM NOW]",
+      attachments: []
+    },
+    {
+      id: "email_511",
+      subject: "BL draft attached — please verify",
+      from: "docs@asiapacificpb.sg",
+      category: "BL_COMPARISON",
+      status: "NEEDS_REVIEW",
+      review_reason: "unreadable",
+      body: "Hi team,\n\nAttached is the draft BL for verification against the SI on file. Let us know if anything needs correcting before we finalize.\n\nRegards,\nAsia Pacific Paperboard Trading",
+      attachments: ["email_511_BL.pdf"],
+      corruptFile: "email_511_BL.pdf",
+      corruptSize: "775 B",
+      draftReply: {
+        language: "English",
+        subject: "Re: BL draft attached — file unreadable",
+        body: "Hi,\n\nThe BL file you sent (email_511_BL.pdf) came through as a 775 B file and won't open on our end — it looks like it may have been corrupted or cut off during sending. Could you re-export and resend it so we can complete the verification?\n\nThanks,\nSDOC Verification Team"
+      }
+    }
+  ];
+
+  const STORE_KEY = "sdoc_review_decisions_v1";
+  function loadDecisions(){
+    try{
+      const raw = localStorage.getItem(STORE_KEY);
+      return raw ? JSON.parse(raw) : {};
+    }catch(e){ return {}; }
+  }
+  function saveDecisions(d){
+    try{ localStorage.setItem(STORE_KEY, JSON.stringify(d)); }catch(e){}
+  }
+  let decisions = loadDecisions();
+  let activeId = EMAILS[0].id;
+
+  function statusPill(e){
+    if(e.status === "OK" && e.category === "SPAM") return '<span class="pill spam">Spam</span>';
+    if(e.status === "OK") return '<span class="pill ok">OK</span>';
+    if(e.status === "MISMATCH") return '<span class="pill mismatch">Mismatch</span>';
+    if(e.status === "NEEDS_REVIEW") return '<span class="pill review">Needs review</span>';
+    return "";
+  }
+
+  function reasonLabel(r){
+    const map = {
+      missing_attachment: "Missing attachment",
+      unreadable: "Unreadable document",
+      wrong_doc_type: "Wrong document type",
+      missing_value: "Missing required value"
+    };
+    return map[r] || r;
+  }
+
+  function renderStats(){
+    const total = EMAILS.length;
+    const reviewed = Object.keys(decisions).length;
+    const flagged = Object.values(decisions).filter(v => v === "flagged").length;
+    const needsReview = EMAILS.filter(e => e.status === "NEEDS_REVIEW" || e.status === "MISMATCH").length;
+    document.getElementById("stats").innerHTML = `
+      <div class="stat"><b>${total}</b><span>In queue</span></div>
+      <div class="stat"><b>${needsReview}</b><span>Flagged by AI</span></div>
+      <div class="stat"><b>${reviewed}</b><span>Reviewed</span></div>
+      <div class="stat"><b>${flagged}</b><span>Escalated</span></div>
+    `;
+  }
+
+  function renderList(){
+    const listEl = document.getElementById("list");
+    let html = '<div class="list-head">Queue</div>';
+    EMAILS.forEach(e => {
+      const d = decisions[e.id];
+      const mark = d === "approved" ? '<span class="decision-mark approved">✓ approved</span>'
+                 : d === "flagged" ? '<span class="decision-mark flagged">⚑ flagged</span>' : "";
+      html += `
+        <button class="item ${e.id === activeId ? "active" : ""}" data-id="${e.id}">
+          <div class="item-top">
+            <span class="item-id">${e.id}</span>
+            ${statusPill(e)}
+          </div>
+          <div class="item-subj">${escapeHtml(e.subject)}</div>
+          <div class="item-top">
+            <span class="item-cat">${e.category}</span>
+            ${mark}
+          </div>
+        </button>
+      `;
+    });
+    listEl.innerHTML = html;
+    listEl.querySelectorAll(".item").forEach(btn => {
+      btn.addEventListener("click", () => {
+        activeId = btn.getAttribute("data-id");
+        renderList();
+        renderDetail();
+      });
+    });
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, c => ({
+      "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+    }[c]));
+  }
+
+  function compareTable(e){
+    const keys = Object.keys(e.si);
+    let rows = "";
+    keys.forEach(k => {
+      const siVal = e.si[k], blVal = e.bl[k];
+      const diff = siVal !== blVal;
+      rows += `
+        <tr class="${diff ? "diff" : ""}">
+          <td class="field-name">${k}</td>
+          <td>${escapeHtml(siVal)}</td>
+          <td class="${diff ? "diff-val" : ""}">${escapeHtml(blVal)}</td>
+        </tr>
+      `;
+    });
+    return `
+      <div class="table-scroll">
+        <table class="compare-table">
+          <thead><tr><th>Field</th><th>SI</th><th>BL (draft)</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  function renderDetail(){
+    const e = EMAILS.find(x => x.id === activeId);
+    const d = decisions[e.id];
+    let extra = "";
+
+    if(e.category === "BL_COMPARISON" && e.si && e.bl){
+      extra = `
+        <div>
+          <div class="section-label">SI vs BL comparison</div>
+          ${compareTable(e)}
+          ${e.has_defect ? `<div class="reason-box review" style="margin-top:10px;">
+            <span class="reason-icon">⚑</span>
+            <div><div class="reason-title">Mismatch detected</div>
+            <div class="reason-text">Fields differing between SI and BL: <code>${e.defect_fields.join("</code>, <code>")}</code></div></div>
+          </div>` : `<div class="reason-box ok" style="margin-top:10px;">
+            <span class="reason-icon">✓</span>
+            <div><div class="reason-title">SI and BL match</div>
+            <div class="reason-text">No discrepancies found across compared fields.</div></div>
+          </div>`}
+        </div>
+      `;
+    } else if(e.review_reason === "missing_attachment"){
+      extra = `
+        <div class="reason-box review">
+          <span class="reason-icon">⚑</span>
+          <div>
+            <div class="reason-title">Needs review — missing_attachment</div>
+            <div class="reason-text">Email references an SI/BL but no document was attached. Cannot run comparison until the sender supplies the file.</div>
+          </div>
+        </div>
+        <div>
+          <div class="section-label">Attachments</div>
+          <div class="attach-row"><span class="attach-chip bad">none found</span></div>
+        </div>
+      `;
+    } else if(e.review_reason === "unreadable"){
+      extra = `
+        <div class="reason-box review">
+          <span class="reason-icon">⚑</span>
+          <div>
+            <div class="reason-title">Needs review — unreadable</div>
+            <div class="reason-text">Attached file failed PDF extraction (invalid structure, ${e.corruptSize}). Confirmed corrupt independently of the parser — file does not open in an external PDF reader either.</div>
+          </div>
+        </div>
+        <div>
+          <div class="section-label">Attachments</div>
+          <div class="attach-row"><span class="attach-chip bad">${e.corruptFile} — ${e.corruptSize}, corrupt</span></div>
+        </div>
+      `;
+    } else if(e.category === "SPAM"){
+      extra = `
+        <div class="reason-box spam">
+          <span class="reason-icon">—</span>
+          <div>
+            <div class="reason-title">Classified as spam</div>
+            <div class="reason-text">Not a shipping document workflow. Routed out of the verification pipeline, no further action needed.</div>
+          </div>
+        </div>
+      `;
+    } else if(e.category === "GENERAL"){
+      extra = `
+        <div class="reason-box ok">
+          <span class="reason-icon">✓</span>
+          <div>
+            <div class="reason-title">General correspondence</div>
+            <div class="reason-text">No SI/BL comparison required — informational email, filed and closed.</div>
+          </div>
+        </div>
+      `;
+    } else if(e.category === "SI_REQUEST" || e.category === "INVOICE_QUERY"){
+      extra = `
+        <div class="reason-box review">
+          <span class="reason-icon">⚑</span>
+          <div>
+            <div class="reason-title">${e.category === "SI_REQUEST" ? "New SI request" : "Invoice query"}</div>
+            <div class="reason-text">${e.category === "SI_REQUEST" ? "No SI/BL to compare yet — sender is requesting a document be issued. Routed to ops for drafting." : "Billing discrepancy raised by sender — routed to accounts, outside the SI/BL comparison scope."}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    const attachChips = e.attachments && e.attachments.length
+      ? `<div><div class="section-label">Attachments</div><div class="attach-row">${e.attachments.map(a => `<span class="attach-chip">${a}</span>`).join("")}</div></div>`
+      : "";
+
+    let draftBlock = "";
+    if(e.draftReply){
+      draftBlock = `
+        <div>
+          <div class="section-label">Auto-drafted reply (Gemini)</div>
+          <div class="draft-box">
+            <div class="draft-head">
+              <span class="draft-tag">⚡ Drafted by pipeline — awaiting review</span>
+              <span class="draft-lang">Reply language: ${escapeHtml(e.draftReply.language)} (matched to sender)</span>
+            </div>
+            <div>
+              <div class="draft-field">Subject</div>
+              <input class="draft-subject" id="draft-subject-${e.id}" value="${escapeHtml(e.draftReply.subject)}">
+            </div>
+            <div>
+              <div class="draft-field">Body</div>
+              <textarea class="draft-textarea" id="draft-body-${e.id}">${escapeHtml(e.draftReply.body)}</textarea>
+            </div>
+            <div class="draft-actions">
+              <button class="btn btn-approve" data-action="send-draft">Approve &amp; send</button>
+              <button class="btn btn-reset" data-action="regenerate-draft">Regenerate</button>
+            </div>
+            <div class="draft-note">Shown here for demo purposes — in production this text is generated by a Gemini node in n8n right after the mismatch/error is detected, and lands in this field for a human to edit and approve. Nothing is hardcoded on the live pipeline side; this prototype just displays and edits whatever n8n outputs.</div>
+          </div>
+        </div>
+      `;
+    }
+
+    document.getElementById("detail").innerHTML = `
+      <div class="detail-head">
+        <div>
+          <div class="detail-id">${e.id}</div>
+          <div class="detail-subj">${escapeHtml(e.subject)}</div>
+          <div class="detail-from">From ${escapeHtml(e.from)}</div>
+        </div>
+        <div class="badges">
+          <span class="pill review" style="background:var(--panel-2);color:var(--ink-dim);border:1px solid var(--border);">${e.category}</span>
+          ${statusPill(e)}
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Email body</div>
+        <div class="email-body">${escapeHtml(e.body)}</div>
+      </div>
+
+      ${e.category !== "BL_COMPARISON" || !e.si ? attachChips : ""}
+
+      ${extra}
+
+      ${draftBlock}
+
+      <div class="actions">
+        <button class="btn btn-approve" data-action="approved">Approve</button>
+        <button class="btn btn-flag" data-action="flagged">Flag for follow-up</button>
+        ${d ? '<button class="btn btn-reset" data-action="reset">Clear decision</button>' : ""}
+        <span class="decision-status ${d || ""}">${d ? (d === "approved" ? "✓ Approved by reviewer" : "⚑ Flagged for follow-up") : "Awaiting review"}</span>
+      </div>
+    `;
+
+    document.getElementById("detail").querySelectorAll(".actions button[data-action]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const action = btn.getAttribute("data-action");
+        if(action === "reset"){ delete decisions[e.id]; }
+        else { decisions[e.id] = action; }
+        saveDecisions(decisions);
+        renderStats();
+        renderList();
+        renderDetail();
+      });
+    });
+
+    const draftEl = document.getElementById("detail");
+    const sendBtn = draftEl.querySelector('[data-action="send-draft"]');
+    if(sendBtn){
+      sendBtn.addEventListener("click", () => {
+        decisions[e.id] = "approved";
+        saveDecisions(decisions);
+        sendBtn.textContent = "Sent ✓";
+        sendBtn.disabled = true;
+        renderStats();
+        renderList();
+      });
+    }
+    const regenBtn = draftEl.querySelector('[data-action="regenerate-draft"]');
+    if(regenBtn){
+      regenBtn.addEventListener("click", () => {
+        const ta = document.getElementById(`draft-body-${e.id}`);
+        if(ta) ta.value = e.draftReply.body;
+        const su = document.getElementById(`draft-subject-${e.id}`);
+        if(su) su.value = e.draftReply.subject;
+      });
+    }
+  }
+
+  renderStats();
+  renderList();
+  renderDetail();
+})();
+</script>
